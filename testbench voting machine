@@ -1,0 +1,51 @@
+module voting_machine_tb();
+    reg clock, reset, mode;
+    reg button1, button2, button3, button4;
+    wire [7:0] led;
+    
+    // Instantiate the voting machine module
+    voting_machine uut (
+        .clock(clock), .reset(reset), .mode(mode),
+        .button1(button1), .button2(button2),
+        .button3(button3), .button4(button4),
+        .led(led)
+    );
+    
+    // Clock generation
+    initial begin
+        clock = 0;
+        forever #5 clock = ~clock;
+    end
+    
+    // Test sequence
+    initial begin
+        // Initialize inputs
+        reset = 1; mode = 0;
+        button1 = 0; button2 = 0; button3 = 0; button4 = 0;
+        #10 reset = 0;
+        
+        // Simulate button presses with valid votes
+        #20 button1 = 1; #50 button1 = 0;
+        #20 button2 = 1; #50 button2 = 0;
+        #20 button3 = 1; #50 button3 = 0;
+        #20 button4 = 1; #50 button4 = 0;
+        
+        // Switch to result mode and observe output
+        #50 mode = 1;
+        #100;
+        
+        // Reset system and re-run test
+        #50 reset = 1;
+        #20 reset = 0;
+        
+        // Additional test case
+        #20 button1 = 1; #50 button1 = 0;
+        #20 button3 = 1; #50 button3 = 0;
+        
+        // Final observation period
+        #100;
+        
+        // Stop simulation
+        $stop;
+    end
+endmodule
